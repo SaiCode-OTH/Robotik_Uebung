@@ -15,7 +15,7 @@ int main()
     while (1)
     {
         touch = SensorTouchClicked(Port_1);
-        if (touch == SensorTouchClicked_Pressed)
+        if (touch == SensorTouch_clicked)
         {
             break;
         }
