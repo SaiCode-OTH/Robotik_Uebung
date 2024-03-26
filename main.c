@@ -3,7 +3,7 @@
 int main()
 {
     sensor_touch_clicked_t touch;
-    SensorConfig(Port_3, SensorTouch);
+    SensorConfig(Port_1, SensorTouch);
 
 
     MotorPortInit(Port_A);
@@ -14,7 +14,7 @@ int main()
 // wait for touch sensor to be clicked
     while (1)
     {
-        touch = SensorTouchClicked(Port_3);
+        touch = SensorTouchClicked(Port_1);
         if (touch == SensorTouchClicked_Pressed)
         {
             break;
