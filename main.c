@@ -1,7 +1,4 @@
 #include "nnxt.h"
-#include <stdio.h>
-
-#define DEG_TO_RPM 166.6667
 
 int main()
 {
@@ -9,23 +6,20 @@ int main()
     SensorConfig(Port_3, SensorTouch);
 
 
-
-    char rpmMsg[10];
-    uint32_t prev_deg_A, deg_A,prev_deg_B, deg_B;
-    uint32_t dt, prev_tick = GetSysTime();
-    double rpm;
-
     MotorPortInit(Port_A);
     MotorPortInit(Port_B);
 
-    Motor_Tacho_GetCounter(Port_A, &prev_deg_A);
-    Motor_Tacho_GetCounter(Port_A, &prev_deg_B);
-
     NNXT_LCD_DisplayStringAtLine(0, "Hello There");
 
-    while(!touch) {
-            !Touch_Clicked(Port_3, &touch)
-
+// wait for touch sensor to be clicked
+    while (1)
+    {
+        touch = SensorTouchClicked(Port_3);
+        if (touch == SensorTouchClicked_Pressed)
+        {
+            break;
+        }
+        Delay(100);
     }
 
     while (1)
