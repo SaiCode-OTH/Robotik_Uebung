@@ -70,8 +70,11 @@ int main()
         sprintf(distStr, "Avg Interval: %d ms ", (int) avg_interval);
         NNXT_LCD_DisplayStringAtLine(1, distStr);
 
-        sprintf(distStr, "Last Press: %d ms ", (int) GetSysTime() - last_press );
+        sprintf(distStr, "Avg Freq: %d Hz ", (int) 1000/avg_interval);
         NNXT_LCD_DisplayStringAtLine(2, distStr);
+
+        sprintf(distStr, "Last Press: %d ms ", (int) GetSysTime() - last_press );
+        NNXT_LCD_DisplayStringAtLine(3, distStr);
 
     }
 
