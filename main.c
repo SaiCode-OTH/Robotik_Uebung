@@ -23,40 +23,24 @@ void driveForward (int delay) {
     Motor_Stop(Port_B, Motor_stop_float);
 }
 
-int detektiereObjekt(){
-    sensor_error_t err;
-    uint8_t dist;
-    char distStr[20];
-
-    err = US_GetDistance(Port_3,&dist);
-    if (err!=sensor_error_NoError){
-        NNXT_LCD_DisplayStringAtLine(0, "Sensor Error!!!!   ");
-        return -1;
-    } else {
-        sprintf(distStr, "Entfernung: %d ",(int)dist);
-        NNXT_LCD_DisplayStringAtLine(0, distStr);
-        return (int)dist;
-    }
-}
-
 
 int main()
 {
     MotorPortInit(Port_A);
     MotorPortInit(Port_B);
-    SensorConfig(Port_3, SensorUS);
 
-    while (1) {
-        int dist = detektiereObjekt();
-        if( dist == -1 ) {
-            return 0;
-        }
-        else if(dist < 15){
-            turnRight(15);
-        } else {
-            driveForward(50);
-        }
+    sensor_touch_clicked_t touch;
+    SensorConfig(Port_1, SensorTouch);
+
+    while(1) {
+       Touch_Clicked(Port_1, &touch);
+       if (touch == SensorTouch_clicked)
+          NNXT_LCD_DisplayStringAtLine(0, "Taster gedrueckt");
+        else
+          NNXT_LCD_DisplayStringAtLine(0, "Taster losgelassen");
+        Delay(20);
     }
+
     return 0;
 }
 
