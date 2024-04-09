@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <EmBitz_layout_file>
 	<ActiveTarget name="Debug" />
+	<File name="Libs\FreeRTOS\FreeRTOS_glue.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2710" topLine="36" />
+		</Cursor>
+	</File>
 	<File name="Libs\STM32 Board\SPL\src\stm32f4xx_exti.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="9014" topLine="209" />
@@ -13,7 +18,7 @@
 	</File>
 	<File name="main.c" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="846" topLine="0" />
+			<Cursor1 position="1147" topLine="27" />
 		</Cursor>
 	</File>
 </EmBitz_layout_file>

@@ -58,13 +58,12 @@ int main()
 
             }
             last_state = touch;
-            Delay(20);
+
         }
         else
         {
             NNXT_LCD_DisplayStringAtLine(0, "Taster losgelassen");
             last_state = touch;
-            Delay(20);
         }
 
         sprintf(distStr, "Avg Interval: %d ms ", (int) avg_interval);
@@ -75,6 +74,7 @@ int main()
 
         sprintf(distStr, "Last Press: %d ms ", (int) GetSysTime() - last_press );
         NNXT_LCD_DisplayStringAtLine(3, distStr);
+        Delay(20);
 
     }
 
