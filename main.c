@@ -59,6 +59,9 @@ int main()
         Delay(20);
         avg_interval = (int)(avg_interval * 0.9 + since_last_press * 0.1);
         since_last_press += 20;
+        NNXT_LCD_DisplayStringAtLine(1, "Avg Interval: %d", avg_interval);
+        NNXT_LCD_DisplayStringAtLine(1, "Last Press: %d", since_last_press);
+
     }
 
     return 0;
