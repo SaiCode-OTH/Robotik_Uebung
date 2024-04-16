@@ -48,6 +48,9 @@ void onLeftSensorClick()
 
 void onRightSensorClick()
 {
+    int i = 0;
+    char distStr[20];
+
     while (1)
     {
         Delay(100);
@@ -55,6 +58,8 @@ void onRightSensorClick()
         Touch_Clicked(Port_2, &touch);
         if (touch == SensorTouch_clicked && right_pressed == 0)
         {
+            sprintf(distStr, "right pressed %d", i++);
+            NNXT_LCD_DisplayStringAtLine(2, distStr);
             right_pressed = 1;
         }
     }
