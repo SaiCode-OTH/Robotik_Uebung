@@ -87,7 +87,6 @@ void drive()
 
         if (left_pressed)
         {
-            NNXT_LCD_DisplayStringAtLine(2, "links gedrueckt");
             // drive forward or backward for 1 second
             Motor_Drive(Port_B, motor_direction, 35);
             Motor_Drive(Port_A, motor_direction, 35);
