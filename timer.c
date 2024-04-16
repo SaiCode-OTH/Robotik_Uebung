@@ -53,7 +53,7 @@ void timerTask()
 {
     while (1)
     {
-        for (uint8_t i = 0; i < MAX_TIMER; i++)
+        for (uint8_t i = 0; i < MAX_TIMERS; i++)
         {
             if (isRunningTimer(i))
             {
