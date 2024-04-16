@@ -63,41 +63,40 @@ void onRightSensorClick()
 
 void drive()
 {
-    motor_dir_t current_direction = Motor_dir_forward;
+    motor_dir_t motor_direction = Motor_dir_forward;
     while (1)
     {
-
-        if (current_direction == Motor_dir_backward)
-        {
-            NNXT_LCD_DisplayStringAtLine(0, "rueckwaerts ");
-        }
-        else
-        {
-            NNXT_LCD_DisplayStringAtLine(0, "vorwaerts     ");
-        }
-
         if (right_pressed)
         {
             // invert direction
-            if (current_direction == Motor_dir_forward)
+            if (motor_direction == Motor_dir_forward)
             {
-                current_direction = Motor_dir_backward;
+                motor_direction = Motor_dir_backward;
             }
             else
             {
-                current_direction = Motor_dir_forward;
+                motor_direction = Motor_dir_forward;
             }
             right_pressed = 0;
         }
 
         if (left_pressed)
         {
-            Motor_Drive(Port_B, current_direction, 35);
-            Motor_Drive(Port_A, current_direction, 35);
+            Motor_Drive(Port_B, motor_direction, 35);
+            Motor_Drive(Port_A, motor_direction, 35);
             Delay(1000);
             Motor_Stop(Port_B, Motor_stop_float);
             Motor_Stop(Port_A, Motor_stop_float);
             left_pressed = 0;
+        }
+
+        if (motor_direction == Motor_dir_backward)
+        {
+            NNXT_LCD_DisplayStringAtLine(0, "rueckwaerts ");
+        }
+        else
+        {
+            NNXT_LCD_DisplayStringAtLine(0, "vorwaerts     ");
         }
     }
 }
