@@ -32,9 +32,9 @@ void onLeftSensorClick()
     while (1)
     {
         Delay(100);
-        sensor_touch_clicked_t touch;
-        Touch_Clicked(Port_1, &touch);
-        if (touch == SensorTouch_clicked && left_pressed == 0)
+        sensor_touch_clicked_t touch1;
+        Touch_Clicked(Port_1, &touch1);
+        if (touch1 == SensorTouch_clicked && left_pressed == 0)
         {
             left_pressed = 1;
         }
