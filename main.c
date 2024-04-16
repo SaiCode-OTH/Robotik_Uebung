@@ -35,7 +35,7 @@ int main()
     sensor_touch_clicked_t last_state;
     char distStr[20];
 
-    uint32_t  last_press = 0;
+    uint32_t last_press = 0;
     int avg_interval = 0;
 
     SensorConfig(Port_1, SensorTouch);
@@ -48,17 +48,17 @@ int main()
             NNXT_LCD_DisplayStringAtLine(0, "Taster gedrueckt");
             if (last_state == SensorTouch_released)
             {
-                if(last_press == 0) {
+                if (last_press == 0)
+                {
                     last_press = GetSysTime();
                 }
-                else {
+                else
+                {
                     avg_interval = (int)(avg_interval * 0.9 + (GetSysTime() - last_press) * 0.1);
                     last_press = GetSysTime();
                 }
-
             }
             last_state = touch;
-
         }
         else
         {
@@ -66,16 +66,15 @@ int main()
             last_state = touch;
         }
 
-        sprintf(distStr, "Avg Interval: %d ms ", (int) avg_interval);
+        sprintf(distStr, "Avg Interval: %d ms ", (int)avg_interval);
         NNXT_LCD_DisplayStringAtLine(1, distStr);
 
-        sprintf(distStr, "Avg Freq: %d Hz ", (int) 1000/avg_interval);
+        sprintf(distStr, "Avg Freq: %d Hz ", (int)1000 / avg_interval);
         NNXT_LCD_DisplayStringAtLine(2, distStr);
 
-        sprintf(distStr, "Last Press: %d ms ", (int) GetSysTime() - last_press );
+        sprintf(distStr, "Last Press: %d ms ", (int)GetSysTime() - last_press);
         NNXT_LCD_DisplayStringAtLine(3, distStr);
         Delay(20);
-
     }
 
     return 0;
