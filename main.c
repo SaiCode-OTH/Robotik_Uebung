@@ -1,62 +1,47 @@
 #include "nnxt.h"
-volatile uint8_t left_pressed = 0;
-volatile uint8_t right_pressed = 0;
+#include "stdbool.h"
+#include "event.h"
+#include "timer.h"
 
-void turnLeft(int degree)
-{
-    Motor_Drive(Port_A, Motor_dir_forward, 75);
-    Motor_Drive(Port_B, Motor_dir_backward, 75);
-    Delay((int)(degree * 3.66));
-    Motor_Stop(Port_A, Motor_stop_float);
-    Motor_Stop(Port_B, Motor_stop_float);
-}
-void turnRight(int degree)
-{
-    Motor_Drive(Port_A, Motor_dir_backward, 75);
-    Motor_Drive(Port_B, Motor_dir_forward, 75);
-    Delay((int)(degree * 3.66));
-    Motor_Stop(Port_A, Motor_stop_float);
-    Motor_Stop(Port_B, Motor_stop_float);
-}
-void driveForward(int delay)
-{
-    Motor_Drive(Port_A, Motor_dir_forward, 75);
-    Motor_Drive(Port_B, Motor_dir_forward, 75);
-    Delay(delay);
-    Motor_Stop(Port_A, Motor_stop_float);
-    Motor_Stop(Port_B, Motor_stop_float);
-}
+#define MOTOR_LEFT Port_B
+#define MOTOR_RIGHT Port_A
+#define TOUCH_LEFT Port_0
+#define TOUCH_RIGHT Port_1
+
+#define CLICK_LEFT 0
+#define CLICK_RIGHT 1
+#define TIMER_FINISHED 2
 
 void onLeftSensorClick()
 {
     while (1)
     {
-        Delay(100);
+        Delay(50);
         sensor_touch_clicked_t touch;
-        Touch_Clicked(Port_0, &touch);
-        if (touch == SensorTouch_clicked && left_pressed == 0)
+        Touch_Clicked(TOUCH_LEFT, &touch);
+        if (touch == SensorTouch_clicked)
         {
-            left_pressed = 1;
+            setEvent(CLICK_LEFT);
         }
     }
 }
 
 void onRightSensorClick()
 {
-    uint8_t recently_right_pressed = 0;
+    bool recently_right_pressed = false;
     while (1)
     {
-        Delay(100);
+        Delay(50);
         sensor_touch_clicked_t touch;
-        Touch_Clicked(Port_1, &touch);
-        if (touch == SensorTouch_clicked && recently_right_pressed == 0)
+        Touch_Clicked(TOUCH_RIGHT, &touch);
+        if (touch == SensorTouch_clicked && !recently_right_pressed)
         {
-            recently_right_pressed = 1;
-            right_pressed = 1;
+            recently_right_pressed = true;
+            setEvent(CLICK_RIGHT);
         }
-        else if (touch == SensorTouch_released && recently_right_pressed == 1)
+        else if (touch == SensorTouch_released && recently_right_pressed)
         {
-            recently_right_pressed = 0;
+            recently_right_pressed = false;
         }
     }
 }
@@ -67,7 +52,7 @@ void drive()
     while (1)
     {
         Delay(10);
-        if (right_pressed)
+        if (eventIsSet(CLICK_RIGHT))
         {
             // invert direction
             if (motor_direction == Motor_dir_forward)
@@ -78,18 +63,23 @@ void drive()
             {
                 motor_direction = Motor_dir_forward;
             }
-            right_pressed = 0;
+            clearEvent(CLICK_RIGHT);
         }
 
-        if (left_pressed)
+        if (eventIsSet(CLICK_LEFT)
         {
             // drive forward or backward for 1 second
-            Motor_Drive(Port_B, motor_direction, 35);
-            Motor_Drive(Port_A, motor_direction, 35);
-            Delay(1000);
-            Motor_Stop(Port_B, Motor_stop_float);
-            Motor_Stop(Port_A, Motor_stop_float);
-            left_pressed = 0;
+            Motor_Drive(MOTOR_LEFT, motor_direction, 35);
+            Motor_Drive(MOTOR_RIGHT, motor_direction, 35);
+            clearEvent(CLICK_LEFT);
+            setTimer(0, 1000, TIMER_FINISHED) && startTimer(0);
+        }
+
+        if (eventIsSet(TIMER_FINISHED))
+        {
+            Motor_Stop(MOTOR_LEFT, Motor_stop_float);
+            Motor_Stop(MOTOR_RIGHT, Motor_stop_float);
+            clearEvent(TIMER_FINISHED);
         }
 
         if (motor_direction == Motor_dir_backward)
@@ -105,10 +95,12 @@ void drive()
 
 int main()
 {
-    MotorPortInit(Port_A);
-    MotorPortInit(Port_B);
-    SensorConfig(Port_1, SensorTouch);
-    SensorConfig(Port_0, SensorTouch);
+    MotorPortInit(MOTOR_LEFT);
+    MotorPortInit(MOTOR_RIGHT);
+    SensorConfig(TOUCH_LEFT, SensorTouch);
+    SensorConfig(TOUCH_RIGHT, SensorTouch);
+
+    CreateAndStartTask(timerTask);
 
     CreateAndStartTask(onLeftSensorClick);
     CreateAndStartTask(onRightSensorClick);
@@ -118,3 +110,4 @@ int main()
 
     return 0;
 }
+
