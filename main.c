@@ -108,7 +108,7 @@ int main()
     MotorPortInit(Port_A);
     MotorPortInit(Port_B);
     SensorConfig(Port_1, SensorTouch);
-    SensorConfig(Port_3, SensorTouch);
+    SensorConfig(Port_0, SensorTouch);
 
     CreateAndStartTask(onLeftSensorClick);
     CreateAndStartTask(onRightSensorClick);
