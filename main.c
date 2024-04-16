@@ -72,7 +72,8 @@ void drive()
             Motor_Drive(MOTOR_LEFT, motor_direction, 35);
             Motor_Drive(MOTOR_RIGHT, motor_direction, 35);
             clearEvent(CLICK_LEFT);
-            setTimer(0, 1000, TIMER_FINISHED) && startTimer(0);
+            setTimer(0, 1000, TIMER_FINISHED);
+            startTimer(0);
         }
 
         if (eventIsSet(TIMER_FINISHED))
