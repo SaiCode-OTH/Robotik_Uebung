@@ -63,6 +63,7 @@ void drive()
         Delay(10);
         if (right_pressed)
         {
+            NNXT_LCD_DisplayStringAtLine(1, "rechts gedrueckt");
             // invert direction
             if (motor_direction == Motor_dir_forward)
             {
@@ -77,6 +78,7 @@ void drive()
 
         if (left_pressed)
         {
+            NNXT_LCD_DisplayStringAtLine(2, "links gedrueckt");
             // drive forward or backward for 1 second
             Motor_Drive(Port_B, motor_direction, 35);
             Motor_Drive(Port_A, motor_direction, 35);
@@ -94,6 +96,7 @@ void drive()
         {
             NNXT_LCD_DisplayStringAtLine(0, "vorwaerts     ");
         }
+
     }
 }
 
