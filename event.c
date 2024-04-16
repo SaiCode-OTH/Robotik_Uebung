@@ -1,4 +1,5 @@
 #include "nnxt.h"
+#include "stdbool.h"
 
 typedef uint8_t EventType;
 volatile uint16_t events = 0;
@@ -10,7 +11,7 @@ void setEvent(EventType ev) {
     taskEXIT_CRITICAL();
 }
 
-uint8_t eventIsSet(EventType ev) {
+bool eventIsSet(EventType ev) {
     uint16_t setter = 1 << ev;
     return events & setter;
 }

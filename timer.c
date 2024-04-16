@@ -1,5 +1,7 @@
 #include "nnxt.h"
-#define MAX_TIMER 16
+#include "stdbool.h"
+
+#define MAX_TIMERS 16
 typedef uint8_t EventType;
 typedef uint8_t TimerType;
 
@@ -13,12 +15,12 @@ typedef struct
 
 volatile timerObject timerArr[MAX_TIMER] = {0};
 
-uint8_t isRunningTimer(TimerType timer)
+bool isRunningTimer(TimerType timer)
 {
     return timerArr[timer].isRunning;
 }
 
-void setTimer(TimerType timer, uint32_t interval, EventType ev)
+bool setTimer(TimerType timer, uint32_t interval, EventType ev)
 {
     if (!isRunningTimer(timer))
     {
@@ -26,16 +28,20 @@ void setTimer(TimerType timer, uint32_t interval, EventType ev)
         timerArr[timer].t_end = NULL;
         timerArr[timer].isRunning = 0;
         timerArr[timer].triggerEvent = ev;
+        return true;
     }
+    return false;
 }
 
-void startTimer(TimerType timer)
+bool startTimer(TimerType timer)
 {
     if (!isRunningTimer(timer))
     {
         timerArr[timer].t_end = GetSysTime() + timerArr[timer].interval;
         timerArr[timer].isRunning = 1;
+        return true;
     }
+    return false;
 }
 
 void cancelTimer(TimerType timer)
