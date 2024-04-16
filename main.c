@@ -29,13 +29,18 @@ void driveForward(int delay)
 
 void onLeftSensorClick()
 {
+    int i = 0;
+    char distStr[20];
+
     while (1)
     {
         Delay(100);
-        sensor_touch_clicked_t touch1;
-        Touch_Clicked(Port_1, &touch1);
-        if (touch1 == SensorTouch_clicked && left_pressed == 0)
+        sensor_touch_clicked_t touch;
+        Touch_Clicked(Port_1, &touch);
+        if (touch == SensorTouch_clicked && left_pressed == 0)
         {
+            sprintf(distStr, "left pressed %d", i++);
+            NNXT_LCD_DisplayStringAtLine(1, distStr);
             left_pressed = 1;
         }
     }
@@ -63,7 +68,6 @@ void drive()
         Delay(10);
         if (right_pressed)
         {
-            NNXT_LCD_DisplayStringAtLine(1, "rechts gedrueckt");
             // invert direction
             if (motor_direction == Motor_dir_forward)
             {
@@ -96,7 +100,6 @@ void drive()
         {
             NNXT_LCD_DisplayStringAtLine(0, "vorwaerts     ");
         }
-
     }
 }
 
