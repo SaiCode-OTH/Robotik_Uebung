@@ -13,7 +13,7 @@ typedef struct
     EventType triggerEvent;
 } timerObject;
 
-volatile timerObject timerArr[MAX_TIMER] = {0};
+volatile timerObject timerArr[MAX_TIMERS] = {0};
 
 bool isRunningTimer(TimerType timer)
 {
