@@ -36,7 +36,7 @@ void onLeftSensorClick()
     {
         Delay(100);
         sensor_touch_clicked_t touch;
-        Touch_Clicked(Port_1, &touch);
+        Touch_Clicked(Port_0, &touch);
         if (touch == SensorTouch_clicked && left_pressed == 0)
         {
             sprintf(distStr, "left pressed %d", i++);
@@ -55,7 +55,7 @@ void onRightSensorClick()
     {
         Delay(100);
         sensor_touch_clicked_t touch;
-        Touch_Clicked(Port_2, &touch);
+        Touch_Clicked(Port_3, &touch);
         if (touch == SensorTouch_clicked && right_pressed == 0)
         {
             sprintf(distStr, "right pressed %d", i++);
@@ -111,8 +111,8 @@ int main()
 {
     MotorPortInit(Port_A);
     MotorPortInit(Port_B);
-    SensorConfig(Port_1, SensorTouch);
-    SensorConfig(Port_2, SensorTouch);
+    SensorConfig(Port_0, SensorTouch);
+    SensorConfig(Port_3, SensorTouch);
 
     CreateAndStartTask(onLeftSensorClick);
     CreateAndStartTask(onRightSensorClick);
