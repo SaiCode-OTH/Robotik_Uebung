@@ -29,9 +29,6 @@ void driveForward(int delay)
 
 void onLeftSensorClick()
 {
-    int i = 0;
-    char distStr[20];
-
     while (1)
     {
         Delay(100);
@@ -39,8 +36,6 @@ void onLeftSensorClick()
         Touch_Clicked(Port_0, &touch);
         if (touch == SensorTouch_clicked && left_pressed == 0)
         {
-            sprintf(distStr, "left pressed %d", i++);
-            NNXT_LCD_DisplayStringAtLine(1, distStr);
             left_pressed = 1;
         }
     }
@@ -48,19 +43,20 @@ void onLeftSensorClick()
 
 void onRightSensorClick()
 {
-    int i = 0;
-    char distStr[20];
-
+    uint8_t recently_right_pressed = 0;
     while (1)
     {
         Delay(100);
         sensor_touch_clicked_t touch;
-        Touch_Clicked(Port_3, &touch);
-        if (touch == SensorTouch_clicked && right_pressed == 0)
+        Touch_Clicked(Port_1, &touch);
+        if (touch == SensorTouch_clicked && recently_right_pressed == 0)
         {
-            sprintf(distStr, "right pressed %d", i++);
-            NNXT_LCD_DisplayStringAtLine(2, distStr);
+            recently_right_pressed = 1;
             right_pressed = 1;
+        }
+        else if (touch == SensorTouch_released && recently_right_pressed == 1)
+        {
+            recently_right_pressed = 0;
         }
     }
 }
@@ -111,7 +107,7 @@ int main()
 {
     MotorPortInit(Port_A);
     MotorPortInit(Port_B);
-    SensorConfig(Port_0, SensorTouch);
+    SensorConfig(Port_1, SensorTouch);
     SensorConfig(Port_3, SensorTouch);
 
     CreateAndStartTask(onLeftSensorClick);
