@@ -34,7 +34,7 @@ void onLeftSensorClick()
         Delay(100);
         sensor_touch_clicked_t touch;
         Touch_Clicked(Port_1, &touch);
-        if (touch == SensorTouch_clicked)
+        if (touch == SensorTouch_clicked && left_pressed == 0)
         {
             left_pressed = 1;
         }
@@ -43,20 +43,14 @@ void onLeftSensorClick()
 
 void onRightSensorClick()
 {
-    uint8_t recently_right_pressed = 0;
     while (1)
     {
         Delay(100);
         sensor_touch_clicked_t touch;
         Touch_Clicked(Port_2, &touch);
-        if (touch == SensorTouch_clicked && recently_right_pressed == 0)
+        if (touch == SensorTouch_clicked && right_pressed == 0)
         {
             right_pressed = 1;
-            recently_right_pressed = 1;
-        }
-        else if (touch != SensorTouch_clicked && recently_right_pressed == 1)
-        {
-            recently_right_pressed = 0;
         }
     }
 }
@@ -66,6 +60,7 @@ void drive()
     motor_dir_t motor_direction = Motor_dir_forward;
     while (1)
     {
+        Delay(10);
         if (right_pressed)
         {
             // invert direction
@@ -82,6 +77,7 @@ void drive()
 
         if (left_pressed)
         {
+            // drive forward or backward for 1 second
             Motor_Drive(Port_B, motor_direction, 35);
             Motor_Drive(Port_A, motor_direction, 35);
             Delay(1000);
