@@ -85,6 +85,10 @@
 			<Add option="-eb_start_files" />
 			<Add option="-eb_lib=n" />
 		</Linker>
+		<Unit filename="event.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="event.h" />
 		<Unit filename="Libs\Display\inc\fonts.h" />
 		<Unit filename="Libs\Display\inc\lcd.h" />
 		<Unit filename="Libs\Display\inc\st7735.h" />
@@ -367,10 +371,14 @@
 		</Unit>
 		<Unit filename="stm32f407vg_flash.ld" />
 		<Unit filename="stm32f407vg_sram.ld" />
+		<Unit filename="timer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="timer.h" />
 		<Extensions>
 			<code_completion />
 			<debugger>
-				<target_debugging_settings target="Release" active_interface="J-link">
+				<target_debugging_settings target="Debug" active_interface="J-link">
 					<debug_interface interface_id="J-link" ip_address="localhost" ip_port="2331" path="%Software\SEGGER\J-Link:InstallPath%" executable="JLinkGDBServer.exe" description="" dont_start_server="false" backoff_time="2000" options="2" reg_filter="0" active_family="STMicroelectronics" gdb_before_conn="" gdb_after_conn="">
 						<family_options family_id="STMicroelectronics">
 							<option opt_id="ID_DEVICE" opt_value="STM32F407VG" />
@@ -394,7 +402,7 @@
 						</family_options>
 					</debug_interface>
 				</target_debugging_settings>
-				<target_debugging_settings target="Debug" active_interface="J-link">
+				<target_debugging_settings target="Release" active_interface="J-link">
 					<debug_interface interface_id="J-link" ip_address="localhost" ip_port="2331" path="%Software\SEGGER\J-Link:InstallPath%" executable="JLinkGDBServer.exe" description="" dont_start_server="false" backoff_time="2000" options="2" reg_filter="0" active_family="STMicroelectronics" gdb_before_conn="" gdb_after_conn="">
 						<family_options family_id="STMicroelectronics">
 							<option opt_id="ID_DEVICE" opt_value="STM32F407VG" />

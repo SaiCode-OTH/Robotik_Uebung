@@ -66,7 +66,7 @@ void drive()
             clearEvent(CLICK_RIGHT);
         }
 
-        if (eventIsSet(CLICK_LEFT)
+        if (eventIsSet(CLICK_LEFT))
         {
             // drive forward or backward for 1 second
             Motor_Drive(MOTOR_LEFT, motor_direction, 35);
