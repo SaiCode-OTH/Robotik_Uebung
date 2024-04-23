@@ -14,23 +14,24 @@
 
 #define DRIVE_LENGTH 1000
 
+// 03, 02, 01, 0, 1, 2, 3 + direction (L, M, R)
 typedef enum
 {
-    "L-3",
-    "L-2",
-    "L-1",
-    "L0",
-    "L1",
-    "L2",
+    L03,
+    L02,
+    L01,
+    L0,
+    L1,
+    L2,
 
-    "M0",
+    M0,
 
-    "R-2",
-    "R-1",
-    "R0",
-    "R1",
-    "R2",
-    "R3",
+    R02,
+    R01,
+    R0,
+    R1,
+    R2,
+    R3,
 } state;
 
 void restartTimer()
@@ -96,7 +97,7 @@ void onRightSensorClick()
 
 void drive()
 {
-    state currentState = "M0";
+    state currentState = M0;
     setTimer(0, 5000, TIMER_FINISHED);
     char dispStr[20];
     while (1)
@@ -105,7 +106,7 @@ void drive()
         {
 
         // Facing left
-        case "L-3":
+        case L03:
             if (eventIsSet(CLICK_LEFT))
             {
                 clearEvent(CLICK_LEFT);
@@ -116,7 +117,7 @@ void drive()
                 turnRight();
                 turnRight();
                 driveForward(DRIVE_LENGTH);
-                currentState = "R-2";
+                currentState = R02;
                 clearEvent(CLICK_RIGHT);
                 restartTimer();
             }
@@ -126,16 +127,16 @@ void drive()
                 turnRight();
                 driveForward(DRIVE_LENGTH * 3);
                 turnLeft();
-                currentState = "M0";
+                currentState = M0;
                 restartTimer();
                 clearEvent(TIMER_FINISHED);
             }
             break;
-        case "L-2":
+        case L02:
             if (eventIsSet(CLICK_LEFT))
             {
                 driveForward(DRIVE_LENGTH);
-                currentState = "L-3";
+                currentState = L03;
                 clearEvent(CLICK_LEFT);
                 restartTimer();
             }
@@ -144,7 +145,7 @@ void drive()
                 turnRight();
                 turnRight();
                 driveForward(DRIVE_LENGTH);
-                currentState = "R-1";
+                currentState = R01;
                 clearEvent(CLICK_RIGHT);
                 restartTimer();
             }
@@ -154,16 +155,16 @@ void drive()
                 turnRight();
                 driveForward(DRIVE_LENGTH * 2);
                 turnLeft();
-                currentState = "M0";
+                currentState = M0;
                 restartTimer();
                 clearEvent(TIMER_FINISHED);
             }
             break;
-        case "L-1":
+        case L01:
             if (eventIsSet(CLICK_LEFT))
             {
                 driveForward(DRIVE_LENGTH);
-                currentState = "L-2";
+                currentState = L02;
                 clearEvent(CLICK_LEFT);
                 restartTimer();
             }
@@ -172,7 +173,7 @@ void drive()
                 turnRight();
                 turnRight();
                 driveForward(DRIVE_LENGTH);
-                currentState = "R0";
+                currentState = R0;
                 clearEvent(CLICK_RIGHT);
                 restartTimer();
             }
@@ -182,16 +183,16 @@ void drive()
                 turnRight();
                 driveForward(DRIVE_LENGTH);
                 turnLeft();
-                currentState = "M0";
+                currentState = M0;
                 restartTimer();
                 clearEvent(TIMER_FINISHED);
             }
             break;
-        case "L0":
+        case L0:
             if (eventIsSet(CLICK_LEFT))
             {
                 driveForward(DRIVE_LENGTH);
-                currentState = "L-1";
+                currentState = L01;
                 clearEvent(CLICK_LEFT);
                 restartTimer();
             }
@@ -200,23 +201,23 @@ void drive()
                 turnRight();
                 turnRight();
                 driveForward(DRIVE_LENGTH);
-                currentState = "R1";
+                currentState = R1;
                 clearEvent(CLICK_RIGHT);
                 restartTimer();
             }
             else if (eventIsSet(TIMER_FINISHED))
             {
                 turnRight();
-                currentState = "M0";
+                currentState = M0;
                 restartTimer();
                 clearEvent(TIMER_FINISHED);
             }
             break;
-        case "L1":
+        case L1:
             if (eventIsSet(CLICK_LEFT))
             {
                 driveForward(DRIVE_LENGTH);
-                currentState = "L0";
+                currentState = L0;
                 clearEvent(CLICK_LEFT);
                 restartTimer();
             }
@@ -225,7 +226,7 @@ void drive()
                 turnRight();
                 turnRight();
                 driveForward(DRIVE_LENGTH);
-                currentState = "R2";
+                currentState = R2;
                 clearEvent(CLICK_RIGHT);
                 restartTimer();
             }
@@ -233,16 +234,16 @@ void drive()
             {
                 driveForward(DRIVE_LENGTH);
                 turnRight();
-                currentState = "M0";
+                currentState = M0;
                 restartTimer();
                 clearEvent(TIMER_FINISHED);
             }
             break;
-        case "L2":
+        case L2:
             if (eventIsSet(CLICK_LEFT))
             {
                 driveForward(DRIVE_LENGTH);
-                currentState = "L1";
+                currentState = L1;
                 clearEvent(CLICK_LEFT);
                 restartTimer();
             }
@@ -251,7 +252,7 @@ void drive()
                 turnRight();
                 turnRight();
                 driveForward(DRIVE_LENGTH);
-                currentState = "R3";
+                currentState = R3;
                 clearEvent(CLICK_RIGHT);
                 restartTimer();
             }
@@ -259,19 +260,19 @@ void drive()
             {
                 driveForward(DRIVE_LENGTH * 2);
                 turnRight();
-                currentState = "M0";
+                currentState = M0;
                 restartTimer();
                 clearEvent(TIMER_FINISHED);
             }
             break;
 
         // Facing up
-        case "M0":
+        case M0:
             if (eventIsSet(CLICK_LEFT))
             {
                 turnLeft();
                 driveForward(DRIVE_LENGTH);
-                currentState = "L-1";
+                currentState = L01;
                 clearEvent(CLICK_LEFT);
                 restartTimer();
             }
@@ -279,7 +280,7 @@ void drive()
             {
                 turnRight();
                 driveForward(DRIVE_LENGTH);
-                currentState = "R1";
+                currentState = R1;
                 clearEvent(CLICK_RIGHT);
                 restartTimer();
             }
@@ -291,13 +292,13 @@ void drive()
             break;
 
         // Facing right
-        case "R3":
+        case R3:
             if (eventIsSet(CLICK_LEFT))
             {
                 turnLeft();
                 turnLeft();
                 driveForward(DRIVE_LENGTH);
-                currentState = "L2";
+                currentState = L2;
                 clearEvent(CLICK_LEFT);
                 restartTimer();
             }
@@ -312,25 +313,25 @@ void drive()
                 turnLeft();
                 driveForward(DRIVE_LENGTH * 3);
                 turnRight();
-                currentState = "M0";
+                currentState = M0;
                 restartTimer();
                 clearEvent(TIMER_FINISHED);
             }
             break;
-        case "R2":
+        case R2:
             if (eventIsSet(CLICK_LEFT))
             {
                 turnLeft();
                 turnLeft();
                 driveForward(DRIVE_LENGTH);
-                currentState = "L1";
+                currentState = L1;
                 clearEvent(CLICK_LEFT);
                 restartTimer();
             }
             else if (eventIsSet(CLICK_RIGHT))
             {
                 driveForward(DRIVE_LENGTH);
-                currentState = "R3";
+                currentState = R3;
                 clearEvent(CLICK_RIGHT);
                 restartTimer();
             }
@@ -340,25 +341,25 @@ void drive()
                 turnLeft();
                 driveForward(DRIVE_LENGTH * 2);
                 turnRight();
-                currentState = "M0";
+                currentState = M0;
                 restartTimer();
                 clearEvent(TIMER_FINISHED);
             }
             break;
-        case "R1":
+        case R1:
             if (eventIsSet(CLICK_LEFT))
             {
                 turnLeft();
                 turnLeft();
                 driveForward(DRIVE_LENGTH);
-                currentState = "L0";
+                currentState = L0;
                 clearEvent(CLICK_LEFT);
                 restartTimer();
             }
             else if (eventIsSet(CLICK_RIGHT))
             {
                 driveForward(DRIVE_LENGTH);
-                currentState = "R2";
+                currentState = R2;
                 clearEvent(CLICK_RIGHT);
                 restartTimer();
             }
@@ -368,50 +369,50 @@ void drive()
                 turnLeft();
                 driveForward(DRIVE_LENGTH);
                 turnRight();
-                currentState = "M0";
+                currentState = M0;
                 restartTimer();
                 clearEvent(TIMER_FINISHED);
             }
             break;
-        case "R0":
+        case R0:
             if (eventIsSet(CLICK_LEFT))
             {
                 turnLeft();
                 turnLeft();
                 driveForward(DRIVE_LENGTH);
-                currentState = "L-1";
+                currentState = L01;
                 clearEvent(CLICK_LEFT);
                 restartTimer();
             }
             else if (eventIsSet(CLICK_RIGHT))
             {
                 driveForward(DRIVE_LENGTH);
-                currentState = "R1";
+                currentState = R1;
                 clearEvent(CLICK_RIGHT);
                 restartTimer();
             }
             else if (eventIsSet(TIMER_FINISHED))
             {
                 turnLeft();
-                currentState = "M0";
+                currentState = M0;
                 restartTimer();
                 clearEvent(TIMER_FINISHED);
             }
             break;
-        case "R-1":
+        case R01:
             if (eventIsSet(CLICK_LEFT))
             {
                 turnLeft();
                 turnLeft();
                 driveForward(DRIVE_LENGTH);
-                currentState = "L-2";
+                currentState = L02;
                 clearEvent(CLICK_LEFT);
                 restartTimer();
             }
             else if (eventIsSet(CLICK_RIGHT))
             {
                 driveForward(DRIVE_LENGTH);
-                currentState = "R0";
+                currentState = R0;
                 clearEvent(CLICK_RIGHT);
                 restartTimer();
             }
@@ -419,25 +420,25 @@ void drive()
             {
                 driveForward(DRIVE_LENGTH);
                 turnLeft();
-                currentState = "M0";
+                currentState = M0;
                 restartTimer();
                 clearEvent(TIMER_FINISHED);
             }
             break;
-        case "R-2":
+        case R02:
             if (eventIsSet(CLICK_LEFT))
             {
                 turnLeft();
                 turnLeft();
                 driveForward(DRIVE_LENGTH);
-                currentState = "L-3";
+                currentState = L03;
                 clearEvent(CLICK_LEFT);
                 restartTimer();
             }
             else if (eventIsSet(CLICK_RIGHT))
             {
                 driveForward(DRIVE_LENGTH);
-                currentState = "R-1";
+                currentState = R01;
                 clearEvent(CLICK_RIGHT);
                 restartTimer();
             }
@@ -445,7 +446,7 @@ void drive()
             {
                 driveForward(DRIVE_LENGTH * 2);
                 turnLeft();
-                currentState = "M0";
+                currentState = M0;
                 restartTimer();
                 clearEvent(TIMER_FINISHED);
             }
