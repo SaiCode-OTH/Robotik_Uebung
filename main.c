@@ -1,481 +1,84 @@
 #include "nnxt.h"
 #include "stdbool.h"
+#include "math.h"
 #include "event.h"
 #include "timer.h"
 
+#define DEG_TO_RPS 2.7778
+#define WHEEL_DIAMETER 4.3
+#define PI 3.14159
+#define TARGET_SPEED 9.0
+#define KP 10
+#define KI 1.5
+#define KD 0.75
+#define DELAY 50
+
 #define MOTOR_LEFT Port_B
 #define MOTOR_RIGHT Port_A
-#define TOUCH_LEFT Port_0
-#define TOUCH_RIGHT Port_1
 
-#define CLICK_LEFT 0
-#define CLICK_RIGHT 1
-#define TIMER_FINISHED 2
+uint32_t speed_last_deg_measure, speed_last_time_measure, last_i_time, last_d_delta;
+double rps, cummulativeDelta;
 
-#define DRIVE_LENGTH 1000
 
-// 03, 02, 01, 0, 1, 2, 3 + direction (L, M, R)
-typedef enum
+void getCurrentSpeed(double *speedInCmPerS)
 {
-    L03,
-    L02,
-    L01,
-    L0,
-    L1,
-    L2,
-
-    M0,
-
-    R02,
-    R01,
-    R0,
-    R1,
-    R2,
-    R3,
-} state;
-
-void restartTimer()
-{
-    clearEvent(TIMER_FINISHED);
-    cancelTimer(0);
-    startTimer(0);
+    uint32_t deg, dt;
+    dt = GetSysTime() - speed_last_time_measure;
+    Motor_Tacho_GetCounter(Port_A, &deg);
+    deg = deg - speed_last_deg_measure;
+    rps = ((deg * 1.33) * DEG_TO_RPS) / (double)dt;
+    Motor_Tacho_GetCounter(Port_A, &speed_last_deg_measure);
+    speed_last_time_measure = GetSysTime();
+    *speedInCmPerS = PI * WHEEL_DIAMETER * rps;
 }
 
-void turnLeft()
+double pRegulator(double diff)
 {
-    Motor_Drive(Port_A, Motor_dir_forward, 75);
-    Motor_Drive(Port_B, Motor_dir_backward, 75);
-    Delay(330);
-    Motor_Stop(Port_A, Motor_stop_float);
-    Motor_Stop(Port_B, Motor_stop_float);
-}
-void turnRight()
-{
-    Motor_Drive(Port_A, Motor_dir_backward, 75);
-    Motor_Drive(Port_B, Motor_dir_forward, 75);
-    Delay(330);
-    Motor_Stop(Port_A, Motor_stop_float);
-    Motor_Stop(Port_B, Motor_stop_float);
+    return KP * diff;
 }
 
-void driveForward(int delay)
+double iRegulator(double diff)
 {
-    Motor_Drive(Port_A, Motor_dir_forward, 75);
-    Motor_Drive(Port_B, Motor_dir_forward, 75);
-    Delay(delay);
-    Motor_Stop(Port_A, Motor_stop_float);
-    Motor_Stop(Port_B, Motor_stop_float);
+    cummulativeDelta += diff;
+    int8_t ret = KI * cummulativeDelta * DELAY;
+    last_i_time = GetSysTime();
+    return ret;
 }
 
-void onLeftSensorClick()
+double dRegulator(double diff)
 {
-    while (1)
-    {
-        Delay(50);
-        sensor_touch_clicked_t touch;
-        Touch_Clicked(TOUCH_LEFT, &touch);
-        if (touch == SensorTouch_clicked)
-        {
-            setEvent(CLICK_LEFT);
-        }
-    }
+    int8_t ret = KD * (diff - last_d_delta) / DELAY;
+    last_d_delta = diff;
+    return ret;
 }
 
-void onRightSensorClick()
-{
-    while (1)
-    {
-        Delay(50);
-        sensor_touch_clicked_t touch;
-        Touch_Clicked(TOUCH_RIGHT, &touch);
-        if (touch == SensorTouch_clicked)
-        {
-            setEvent(CLICK_RIGHT);
-        }
-    }
-}
-
-void drive()
-{
-    state currentState = M0;
-    setTimer(0, 5000, TIMER_FINISHED);
-    char dispStr[20];
-    while (1)
-    {
-        switch (currentState)
-        {
-
-        // Facing left
-        case L03:
-            if (eventIsSet(CLICK_LEFT))
-            {
-                clearEvent(CLICK_LEFT);
-                restartTimer();
-            }
-            else if (eventIsSet(CLICK_RIGHT))
-            {
-                turnRight();
-                turnRight();
-                driveForward(DRIVE_LENGTH);
-                currentState = R02;
-                clearEvent(CLICK_RIGHT);
-                restartTimer();
-            }
-            else if (eventIsSet(TIMER_FINISHED))
-            {
-                turnRight();
-                turnRight();
-                driveForward(DRIVE_LENGTH * 3);
-                turnLeft();
-                currentState = M0;
-                restartTimer();
-                clearEvent(TIMER_FINISHED);
-            }
-            break;
-        case L02:
-            if (eventIsSet(CLICK_LEFT))
-            {
-                driveForward(DRIVE_LENGTH);
-                currentState = L03;
-                clearEvent(CLICK_LEFT);
-                restartTimer();
-            }
-            else if (eventIsSet(CLICK_RIGHT))
-            {
-                turnRight();
-                turnRight();
-                driveForward(DRIVE_LENGTH);
-                currentState = R01;
-                clearEvent(CLICK_RIGHT);
-                restartTimer();
-            }
-            else if (eventIsSet(TIMER_FINISHED))
-            {
-                turnRight();
-                turnRight();
-                driveForward(DRIVE_LENGTH * 2);
-                turnLeft();
-                currentState = M0;
-                restartTimer();
-                clearEvent(TIMER_FINISHED);
-            }
-            break;
-        case L01:
-            if (eventIsSet(CLICK_LEFT))
-            {
-                driveForward(DRIVE_LENGTH);
-                currentState = L02;
-                clearEvent(CLICK_LEFT);
-                restartTimer();
-            }
-            else if (eventIsSet(CLICK_RIGHT))
-            {
-                turnRight();
-                turnRight();
-                driveForward(DRIVE_LENGTH);
-                currentState = R0;
-                clearEvent(CLICK_RIGHT);
-                restartTimer();
-            }
-            else if (eventIsSet(TIMER_FINISHED))
-            {
-                turnRight();
-                turnRight();
-                driveForward(DRIVE_LENGTH);
-                turnLeft();
-                currentState = M0;
-                restartTimer();
-                clearEvent(TIMER_FINISHED);
-            }
-            break;
-        case L0:
-            if (eventIsSet(CLICK_LEFT))
-            {
-                driveForward(DRIVE_LENGTH);
-                currentState = L01;
-                clearEvent(CLICK_LEFT);
-                restartTimer();
-            }
-            else if (eventIsSet(CLICK_RIGHT))
-            {
-                turnRight();
-                turnRight();
-                driveForward(DRIVE_LENGTH);
-                currentState = R1;
-                clearEvent(CLICK_RIGHT);
-                restartTimer();
-            }
-            else if (eventIsSet(TIMER_FINISHED))
-            {
-                turnRight();
-                currentState = M0;
-                restartTimer();
-                clearEvent(TIMER_FINISHED);
-            }
-            break;
-        case L1:
-            if (eventIsSet(CLICK_LEFT))
-            {
-                driveForward(DRIVE_LENGTH);
-                currentState = L0;
-                clearEvent(CLICK_LEFT);
-                restartTimer();
-            }
-            else if (eventIsSet(CLICK_RIGHT))
-            {
-                turnRight();
-                turnRight();
-                driveForward(DRIVE_LENGTH);
-                currentState = R2;
-                clearEvent(CLICK_RIGHT);
-                restartTimer();
-            }
-            else if (eventIsSet(TIMER_FINISHED))
-            {
-                driveForward(DRIVE_LENGTH);
-                turnRight();
-                currentState = M0;
-                restartTimer();
-                clearEvent(TIMER_FINISHED);
-            }
-            break;
-        case L2:
-            if (eventIsSet(CLICK_LEFT))
-            {
-                driveForward(DRIVE_LENGTH);
-                currentState = L1;
-                clearEvent(CLICK_LEFT);
-                restartTimer();
-            }
-            else if (eventIsSet(CLICK_RIGHT))
-            {
-                turnRight();
-                turnRight();
-                driveForward(DRIVE_LENGTH);
-                currentState = R3;
-                clearEvent(CLICK_RIGHT);
-                restartTimer();
-            }
-            else if (eventIsSet(TIMER_FINISHED))
-            {
-                driveForward(DRIVE_LENGTH * 2);
-                turnRight();
-                currentState = M0;
-                restartTimer();
-                clearEvent(TIMER_FINISHED);
-            }
-            break;
-
-        // Facing up
-        case M0:
-            if (eventIsSet(CLICK_LEFT))
-            {
-                turnLeft();
-                driveForward(DRIVE_LENGTH);
-                currentState = L01;
-                clearEvent(CLICK_LEFT);
-                restartTimer();
-            }
-            else if (eventIsSet(CLICK_RIGHT))
-            {
-                turnRight();
-                driveForward(DRIVE_LENGTH);
-                currentState = R1;
-                clearEvent(CLICK_RIGHT);
-                restartTimer();
-            }
-            else if (eventIsSet(TIMER_FINISHED))
-            {
-                restartTimer();
-                clearEvent(TIMER_FINISHED);
-            }
-            break;
-
-        // Facing right
-        case R3:
-            if (eventIsSet(CLICK_LEFT))
-            {
-                turnLeft();
-                turnLeft();
-                driveForward(DRIVE_LENGTH);
-                currentState = L2;
-                clearEvent(CLICK_LEFT);
-                restartTimer();
-            }
-            else if (eventIsSet(CLICK_RIGHT))
-            {
-                clearEvent(CLICK_RIGHT);
-                restartTimer();
-            }
-            else if (eventIsSet(TIMER_FINISHED))
-            {
-                turnLeft();
-                turnLeft();
-                driveForward(DRIVE_LENGTH * 3);
-                turnRight();
-                currentState = M0;
-                restartTimer();
-                clearEvent(TIMER_FINISHED);
-            }
-            break;
-        case R2:
-            if (eventIsSet(CLICK_LEFT))
-            {
-                turnLeft();
-                turnLeft();
-                driveForward(DRIVE_LENGTH);
-                currentState = L1;
-                clearEvent(CLICK_LEFT);
-                restartTimer();
-            }
-            else if (eventIsSet(CLICK_RIGHT))
-            {
-                driveForward(DRIVE_LENGTH);
-                currentState = R3;
-                clearEvent(CLICK_RIGHT);
-                restartTimer();
-            }
-            else if (eventIsSet(TIMER_FINISHED))
-            {
-                turnLeft();
-                turnLeft();
-                driveForward(DRIVE_LENGTH * 2);
-                turnRight();
-                currentState = M0;
-                restartTimer();
-                clearEvent(TIMER_FINISHED);
-            }
-            break;
-        case R1:
-            if (eventIsSet(CLICK_LEFT))
-            {
-                turnLeft();
-                turnLeft();
-                driveForward(DRIVE_LENGTH);
-                currentState = L0;
-                clearEvent(CLICK_LEFT);
-                restartTimer();
-            }
-            else if (eventIsSet(CLICK_RIGHT))
-            {
-                driveForward(DRIVE_LENGTH);
-                currentState = R2;
-                clearEvent(CLICK_RIGHT);
-                restartTimer();
-            }
-            else if (eventIsSet(TIMER_FINISHED))
-            {
-                turnLeft();
-                turnLeft();
-                driveForward(DRIVE_LENGTH);
-                turnRight();
-                currentState = M0;
-                restartTimer();
-                clearEvent(TIMER_FINISHED);
-            }
-            break;
-        case R0:
-            if (eventIsSet(CLICK_LEFT))
-            {
-                turnLeft();
-                turnLeft();
-                driveForward(DRIVE_LENGTH);
-                currentState = L01;
-                clearEvent(CLICK_LEFT);
-                restartTimer();
-            }
-            else if (eventIsSet(CLICK_RIGHT))
-            {
-                driveForward(DRIVE_LENGTH);
-                currentState = R1;
-                clearEvent(CLICK_RIGHT);
-                restartTimer();
-            }
-            else if (eventIsSet(TIMER_FINISHED))
-            {
-                turnLeft();
-                currentState = M0;
-                restartTimer();
-                clearEvent(TIMER_FINISHED);
-            }
-            break;
-        case R01:
-            if (eventIsSet(CLICK_LEFT))
-            {
-                turnLeft();
-                turnLeft();
-                driveForward(DRIVE_LENGTH);
-                currentState = L02;
-                clearEvent(CLICK_LEFT);
-                restartTimer();
-            }
-            else if (eventIsSet(CLICK_RIGHT))
-            {
-                driveForward(DRIVE_LENGTH);
-                currentState = R0;
-                clearEvent(CLICK_RIGHT);
-                restartTimer();
-            }
-            else if (eventIsSet(TIMER_FINISHED))
-            {
-                driveForward(DRIVE_LENGTH);
-                turnLeft();
-                currentState = M0;
-                restartTimer();
-                clearEvent(TIMER_FINISHED);
-            }
-            break;
-        case R02:
-            if (eventIsSet(CLICK_LEFT))
-            {
-                turnLeft();
-                turnLeft();
-                driveForward(DRIVE_LENGTH);
-                currentState = L03;
-                clearEvent(CLICK_LEFT);
-                restartTimer();
-            }
-            else if (eventIsSet(CLICK_RIGHT))
-            {
-                driveForward(DRIVE_LENGTH);
-                currentState = R01;
-                clearEvent(CLICK_RIGHT);
-                restartTimer();
-            }
-            else if (eventIsSet(TIMER_FINISHED))
-            {
-                driveForward(DRIVE_LENGTH * 2);
-                turnLeft();
-                currentState = M0;
-                restartTimer();
-                clearEvent(TIMER_FINISHED);
-            }
-            break;
-
-        default:
-            return 0;
-            break;
-        }
-
-        sprintf(dispStr, "%d  ", currentState);
-        NNXT_LCD_DisplayStringAtLine(0, dispStr);
-    }
-}
 
 int main()
 {
-    MotorPortInit(MOTOR_LEFT);
-    MotorPortInit(MOTOR_RIGHT);
-    SensorConfig(TOUCH_LEFT, SensorTouch);
-    SensorConfig(TOUCH_RIGHT, SensorTouch);
+    int8_t motorForce;
+    double currentSpeed, ds;
+    char dispMsg[20];
 
-    CreateAndStartTask(timerTask);
-
-    CreateAndStartTask(onLeftSensorClick);
-    CreateAndStartTask(onRightSensorClick);
-    CreateAndStartTask(drive);
-
-    StartScheduler();
-
+    Motor_Tacho_GetCounter(MOTOR_RIGHT, &speed_last_deg_measure);
+    last_i_time = speed_last_time_measure = GetSysTime();
+    last_d_delta = speed_last_deg_measure = motorForce = cummulativeDelta = 0;
+    while (1)
+    {
+        // calculate speed difference
+        getCurrentSpeed(&currentSpeed);
+        sprintf(dispMsg, "%f    ", currentSpeed);
+        NNXT_LCD_DisplayStringAtLine(0, dispMsg);
+        ds = TARGET_SPEED - currentSpeed;
+        // call regulators
+        motorForce = (pRegulator(ds) + iRegulator(ds) + dRegulator(ds));
+        // limit motor force between 0 and 80
+        motorForce = (motorForce < 0) ? 0 : (motorForce > 80) ? 80
+                                                              : motorForce;
+        sprintf(dispMsg, "%d    ", motorForce);
+        NNXT_LCD_DisplayStringAtLine(1, dispMsg);
+        // power motor
+        Motor_Drive(Port_A, Motor_dir_forward, motorForce);
+        Delay(DELAY);
+    }
     return 0;
 }
