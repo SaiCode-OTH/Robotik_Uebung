@@ -1,10 +1,7 @@
 #include "nnxt.h"
 #include "stdbool.h"
-#include "math.h"
-#include "event.h"
-#include "timer.h"
 
-#define DEG_TO_RPS 166.6667/60
+#define DEG_TO_RPS (166.6667/60)
 #define WHEEL_DIAMETER 4.3
 #define PI 3.14159
 
@@ -12,10 +9,9 @@
 #define KP 10
 #define KI 1.5
 #define KD 0.75
-#define DELAY 50
+#define DELAY 100
 
-#define MOTOR_LEFT Port_B
-#define MOTOR_RIGHT Port_A
+#define MOTOR Port_A
 
 uint32_t speed_last_deg_measure, speed_last_time_measure, last_i_time, last_d_delta;
 double rps, cummulativeDelta;
@@ -25,10 +21,10 @@ void getCurrentSpeed(double *speedInCmPerS)
 {
     uint32_t deg, dt;
     dt = GetSysTime() - speed_last_time_measure;
-    Motor_Tacho_GetCounter(Port_A, &deg);
+    Motor_Tacho_GetCounter(MOTOR, &deg);
     deg = deg - speed_last_deg_measure;
     rps = ((deg * 1.33) * DEG_TO_RPS) / (double)dt;
-    Motor_Tacho_GetCounter(Port_A, &speed_last_deg_measure);
+    Motor_Tacho_GetCounter(MOTOR, &speed_last_deg_measure);
     speed_last_time_measure = GetSysTime();
     *speedInCmPerS = PI * WHEEL_DIAMETER * rps;
 }
@@ -60,25 +56,36 @@ int main()
     double currentSpeed, ds;
     char dispMsg[20];
 
-    Motor_Tacho_GetCounter(MOTOR_RIGHT, &speed_last_deg_measure);
+    Motor_Tacho_GetCounter(MOTOR, &speed_last_deg_measure);
     last_i_time = speed_last_time_measure = GetSysTime();
     last_d_delta = speed_last_deg_measure = motorForce = cummulativeDelta = 0;
     while (1)
     {
         // calculate speed difference
         getCurrentSpeed(&currentSpeed);
-        sprintf(dispMsg, "%f    ", currentSpeed);
+        sprintf(dispMsg, "sp: %f    ", currentSpeed);
         NNXT_LCD_DisplayStringAtLine(0, dispMsg);
         ds = TARGET_SPEED - currentSpeed;
-        // call regulators
-        motorForce = (pRegulator(ds) + iRegulator(ds) + dRegulator(ds));
-        // limit motor force between 0 and 80
-        motorForce = (motorForce < 0) ? 0 : (motorForce > 80) ? 80
-                                                              : motorForce;
-        sprintf(dispMsg, "%d    ", motorForce);
+        
+        sprintf(dispMsg, "ds: %f    ", ds);
         NNXT_LCD_DisplayStringAtLine(1, dispMsg);
-        // power motor
-        Motor_Drive(Port_A, Motor_dir_forward, motorForce);
+        // call regulators
+        motorForce = pRegulator(ds) + iRegulator(ds) + dRegulator(ds);
+        // cap motor force if above 100
+        if (motorForce > 100) {
+            motorForce = 100;
+        }
+        else if (motorForce < 0) {
+            motorForce = 0;
+        }
+
+
+        sprintf(dispMsg, "force: %d    ", motorForce);
+        NNXT_LCD_DisplayStringAtLine(2, dispMsg);
+
+        
+        // apply motor force
+        Motor_Drive(MOTOR, Motor_dir_forward, motorForce);
         Delay(DELAY);
     }
     return 0;
