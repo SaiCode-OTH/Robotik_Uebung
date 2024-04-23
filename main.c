@@ -4,9 +4,10 @@
 #include "event.h"
 #include "timer.h"
 
-#define DEG_TO_RPS 2.7778
+#define DEG_TO_RPS 166.6667/60
 #define WHEEL_DIAMETER 4.3
 #define PI 3.14159
+
 #define TARGET_SPEED 9.0
 #define KP 10
 #define KI 1.5
