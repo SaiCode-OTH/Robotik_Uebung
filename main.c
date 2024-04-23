@@ -481,6 +481,9 @@ void drive()
             return 0;
             break;
         }
+
+        sprintf(dispStr, "%d  ", currentState);
+        NNXT_LCD_DisplayStringAtLine(0, currentState);
     }
 }
 
