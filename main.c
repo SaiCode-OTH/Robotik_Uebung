@@ -1,29 +1,3 @@
-/*
-In dieser Aufgabe sollen Sie eine Steuerung implementieren. Die Umwelt des Roboters
-besteht aus 7 gleichgroßen Quadranten (Größe können Sie wählen), die horizontal angeordnet
-sind. Im Startzustand befindet sich der Roboter im mittleren Quadranten mit einer vertikalen
-Ausrichtung. Das folgende Bild stellt dies dar:
-Die Steuerung soll nun das folgende Verhalten implementieren:
-• Bei einem Druck auf den rechten Taster soll der Roboter in den nächsten Quadranten
-rechts von der aktuellen Position fahren. Befindet sich der Roboter im letzten
-Quadranten, soll nichts geschehen. Die Ausrichtung des Roboters im nächsten
-Quadranten soll der Fahrtrichtung entsprechen.
-• Bei einem Druck auf den linken Taster soll der Roboter in den nächsten Quadranten
-links von der aktuellen Position fahren. Befindet sich der Roboter im letzten
-Quadranten, soll nichts geschehen. Die Ausrichtung des Roboters im nächsten
-Quadranten soll der Fahrtrichtung entsprechen.
-• Wird innerhalb eines Intervalls von 5 Sekunden keiner der beiden Taster gedrückt, so
-soll der Roboter wieder in den Startzustand zurückkehren (mittlerer Quadrant,
-Ausrichtung vertikal, siehe Bild).
-Für die Erkennung des Tastendrucks nehmen Sie bitte die Implementierung aus Aufgabe 2
-inkl. der Event-Erzeugung. Zur Implementierung bitte das folgende Vorgehen anwenden:
-a) Definieren Sie die möglichen Zustände des Systems (bestehend aus Quadrant und
-Ausrichtung des Roboters)
-b) Entwerfen Sie einen Automaten, der diese Steuerung implementiert
-c) Implementieren Sie den Automaten aus b) in C. Verwenden Sie hierbei bitte die
-Funktionen für Timer und Events aus Aufgabe 1.
-*/
-
 #include "nnxt.h"
 #include "stdbool.h"
 #include "event.h"
