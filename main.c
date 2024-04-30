@@ -62,7 +62,7 @@ void baguette() {
             startTimer(0);
             clearEvent(TIMER_FINISHED);
         }
-        if(eventIsSet(LEFT_CLICK)){
+        if(eventIsSet(CLICK_LEFT)){
             freq /= 2;
             sprintf(dispMsg, "Sub: %d     ", freq);
             NNXT_LCD_DisplayStringAtLine(1, dispMsg);
@@ -70,9 +70,9 @@ void baguette() {
             setTimer(0, freq, TIMER_FINISHED);
             clearEvent(TIMER_FINISHED);
             startTimer(0);
-            clearEvent(LEFT_CLICK);
+            clearEvent(CLICK_LEFT);
         }
-        if(eventIsSet(RIGHT_CLICK)){
+        if(eventIsSet(CLICK_RIGHT)){
             freq *= 2;
             sprintf(dispMsg, "Add: %d     ", freq);
             NNXT_LCD_DisplayStringAtLine(1, dispMsg);
@@ -80,7 +80,7 @@ void baguette() {
             setTimer(0, freq, TIMER_FINISHED);
             clearEvent(TIMER_FINISHED);
             startTimer(0);
-            clearEvent(RIGHT_CLICK);
+            clearEvent(CLICK_RIGHT);
         }
     }
 
