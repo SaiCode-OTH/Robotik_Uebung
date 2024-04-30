@@ -42,30 +42,38 @@ void onRightSensorClick()
     }
 }
 
-void baguette() {
+void baguette()
+{
     uint32_t freq = 1000;
     char dispMsg[100];
     bool ledOn = false;
     setTimer(0, freq, TIMER_FINISHED);
     startTimer(0);
-    while(1){
-        if(eventIsSet(TIMER_FINISHED)){
-            sprintf(dispMsg, "Freq : %d   ", (int) freq);
-            NNXT_LCD_DisplayStringAtLine(0, dispMsg);
+    sprintf(dispMsg, "Freq : %d   ", (int)freq);
+    NNXT_LCD_DisplayStringAtLine(0, dispMsg);
+    while (1)
+    {
+        if (eventIsSet(TIMER_FINISHED))
+        {
             ledOn = !ledOn;
-            if(ledOn){
+            if (ledOn)
+            {
                 WritePort(I2C_PORT, 0);
-            } else {
+            }
+            else
+            {
                 DeletePort(I2C_PORT, 0);
             }
             cancelTimer(0);
             startTimer(0);
             clearEvent(TIMER_FINISHED);
         }
-        if(eventIsSet(CLICK_LEFT)){
+        if (eventIsSet(CLICK_LEFT))
+        {
             freq /= 2;
-            if(freq < 1) freq = 1;
-            sprintf(dispMsg, "Freq : %d   ", (int) freq);
+            if (freq < 1)
+                freq = 1;
+            sprintf(dispMsg, "Freq : %d   ", (int)freq);
             NNXT_LCD_DisplayStringAtLine(0, dispMsg);
             cancelTimer(0);
             setTimer(0, freq, TIMER_FINISHED);
@@ -73,10 +81,12 @@ void baguette() {
             startTimer(0);
             clearEvent(CLICK_LEFT);
         }
-        if(eventIsSet(CLICK_RIGHT)){
+        if (eventIsSet(CLICK_RIGHT))
+        {
             freq *= 2;
-            if(freq > 10000) freq = 10000;
-            sprintf(dispMsg, "Freq : %d   ", (int) freq);
+            if (freq > 10000)
+                freq = 10000;
+            sprintf(dispMsg, "Freq : %d   ", (int)freq);
             NNXT_LCD_DisplayStringAtLine(0, dispMsg);
             cancelTimer(0);
             setTimer(0, freq, TIMER_FINISHED);
@@ -85,9 +95,7 @@ void baguette() {
             clearEvent(CLICK_RIGHT);
         }
     }
-
 }
-
 
 int main()
 {
