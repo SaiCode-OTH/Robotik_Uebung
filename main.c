@@ -50,7 +50,7 @@ void baguette() {
     startTimer(0);
     while(1){
         if(eventIsSet(TIMER_FINISHED)){
-            sprintf(dispMsg, "Freqency : %d Hz   ", freq/1000);
+            sprintf(dispMsg, "Freqency : %d Hz   ", 1000/freq);
             NNXT_LCD_DisplayStringAtLine(0, dispMsg);
             ledOn = !ledOn;
             if(ledOn){
