@@ -1,106 +1,104 @@
 #include "nnxt.h"
+#include "nnxt_pcf8574lb.h"
 #include "stdbool.h"
+#include "event.h"
+#include "timer.h"
 
-#define DEG_TO_RPS (166.6667 / 60)
-#define WHEEL_DIAMETER 4.3
-#define PI 3.14159
+#define I2C_PORT Port_3
 
-#define TARGET_SPEED 9.0
-#define KP 15
-#define KI 0.01
-#define KD 0.75
-#define DELAY 50
+#define TOUCH_LEFT Port_0
+#define TOUCH_RIGHT Port_1
 
-#define MOTOR Port_A
+#define CLICK_LEFT 0
+#define CLICK_RIGHT 1
 
-uint32_t speed_last_deg_measure, speed_last_time_measure, last_i_time;
-double last_d_delta = 0.0;
-double rps;
-double cumulativeDelta = 0.0;
+#define TIMER_FINISHED 2
 
-void getCurrentSpeed(double *speedInCmPerS)
+void onLeftSensorClick()
 {
-    uint32_t deg, dt;
-    dt = GetSysTime() - speed_last_time_measure;
-    Motor_Tacho_GetCounter(MOTOR, &deg);
-    deg = deg - speed_last_deg_measure;
-    rps = ((deg * 1.33) * DEG_TO_RPS) / (double)dt;
-    Motor_Tacho_GetCounter(MOTOR, &speed_last_deg_measure);
-    speed_last_time_measure = GetSysTime();
-    *speedInCmPerS = PI * WHEEL_DIAMETER * rps;
-}
-
-double pRegulator(double diff)
-{
-    char dispMsg[20];
-    sprintf(dispMsg, "p: %f    ", KP * diff);
-    NNXT_LCD_DisplayStringAtLine(5, dispMsg);
-    return KP * diff;
-}
-
-double iRegulator(double diff)
-{
-    if (diff != diff || diff == 0)
+    while (1)
     {
-        return 0;
+        Delay(50);
+        sensor_touch_clicked_t touch;
+        Touch_Clicked(TOUCH_LEFT, &touch);
+        if (touch == SensorTouch_clicked)
+        {
+            setEvent(CLICK_LEFT);
+        }
     }
-    cumulativeDelta = cumulativeDelta + diff;
-    double ret = KI * cumulativeDelta * DELAY;
-    last_i_time = GetSysTime();
-
-    char dispMsg[20];
-    sprintf(dispMsg, "i: %f    ", ret);
-    NNXT_LCD_DisplayStringAtLine(6, dispMsg);
-    return ret;
 }
 
-double dRegulator(double diff)
+void onRightSensorClick()
 {
-    double ret = KD * (diff - last_d_delta) / DELAY;
-    last_d_delta = diff;
-    char dispMsg[20];
-    sprintf(dispMsg, "d: %f    ", ret);
-    NNXT_LCD_DisplayStringAtLine(7, dispMsg);
-    return ret;
+    while (1)
+    {
+        Delay(50);
+        sensor_touch_clicked_t touch;
+        Touch_Clicked(TOUCH_RIGHT, &touch);
+        if (touch == SensorTouch_clicked)
+        {
+            setEvent(CLICK_RIGHT);
+        }
+    }
 }
+
+void baguette() {
+    uint32_t freq = 1000;
+    char dispMsg[100];
+    bool ledOn = false;
+    setTimer(0, freq, TIMER_FINISHED);
+    startTimer(0);
+    while(1){
+        if(eventIsSet(TIMER_FINISHED)){
+            sprintf(dispMsg, "Freqency : %d Hz   ", freq/1000);
+            NNXT_LCD_DisplayStringAtLine(0, dispMsg);
+            ledOn = !ledOn;
+            if(ledOn){
+                WritePort(I2C_PORT, 0);
+            } else {
+                DeletePort(I2C_PORT, 0);
+            }
+            cancelTimer(0);
+            startTimer(0);
+            clearEvent(TIMER_FINISHED);
+        }
+        if(eventIsSet(LEFT_CLICK)){
+            freq /= 2;
+            sprintf(dispMsg, "Sub: %d     ", freq);
+            NNXT_LCD_DisplayStringAtLine(1, dispMsg);
+            cancelTimer(0);
+            setTimer(0, freq, TIMER_FINISHED);
+            clearEvent(TIMER_FINISHED);
+            startTimer(0);
+            clearEvent(LEFT_CLICK);
+        }
+        if(eventIsSet(RIGHT_CLICK)){
+            freq *= 2;
+            sprintf(dispMsg, "Add: %d     ", freq);
+            NNXT_LCD_DisplayStringAtLine(1, dispMsg);
+            cancelTimer(0);
+            setTimer(0, freq, TIMER_FINISHED);
+            clearEvent(TIMER_FINISHED);
+            startTimer(0);
+            clearEvent(RIGHT_CLICK);
+        }
+    }
+
+}
+
 
 int main()
 {
-    int16_t motorForce;
-    double currentSpeed, ds;
-    char dispMsg[20];
+    SensorConfig(TOUCH_LEFT, SensorTouch);
+    SensorConfig(TOUCH_RIGHT, SensorTouch);
 
-    Motor_Tacho_GetCounter(MOTOR, &speed_last_deg_measure);
-    last_i_time = speed_last_time_measure = GetSysTime();
-    speed_last_deg_measure = motorForce = 0;
-    while (1)
-    {
-        // calculate speed difference
-        getCurrentSpeed(&currentSpeed);
-        sprintf(dispMsg, "sp: %f    ", currentSpeed);
-        NNXT_LCD_DisplayStringAtLine(0, dispMsg);
-        ds = TARGET_SPEED - currentSpeed;
+    CreateAndStartTask(timerTask);
 
-        sprintf(dispMsg, "ds: %f    ", ds);
-        NNXT_LCD_DisplayStringAtLine(1, dispMsg);
-        // call regulators
-        motorForce = (pRegulator(ds) + iRegulator(ds) + dRegulator(ds));
-        // cap motor force if above 100
-        if (motorForce > 100)
-        {
-            motorForce = 100;
-        }
-        else if (motorForce < 0)
-        {
-            motorForce = 0;
-        }
+    CreateAndStartTask(onLeftSensorClick);
+    CreateAndStartTask(onRightSensorClick);
+    CreateAndStartTask(baguette);
 
-        sprintf(dispMsg, "force: %d    ", motorForce);
-        NNXT_LCD_DisplayStringAtLine(2, dispMsg);
+    StartScheduler();
 
-        // apply motor force
-        Motor_Drive(MOTOR, Motor_dir_forward, motorForce);
-        Delay(DELAY);
-    }
     return 0;
 }

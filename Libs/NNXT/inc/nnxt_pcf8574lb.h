@@ -11,7 +11,7 @@
 
 /*********************************/
 /*           macros              */
-#define PCF8574_Address          0x70
+#define PCF8574_Address          0x40
 /*********************************/
 /*      extern variables         */
 
