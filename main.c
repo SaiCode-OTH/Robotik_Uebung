@@ -50,7 +50,7 @@ void baguette() {
     startTimer(0);
     while(1){
         if(eventIsSet(TIMER_FINISHED)){
-            sprintf(dispMsg, "Freqency : %f Hz   ", 1000/freq);
+            sprintf(dispMsg, "Freq : %d   ", (int) freq);
             NNXT_LCD_DisplayStringAtLine(0, dispMsg);
             ledOn = !ledOn;
             if(ledOn){
@@ -65,7 +65,7 @@ void baguette() {
         if(eventIsSet(CLICK_LEFT)){
             freq /= 2;
             if(freq < 1) freq = 1;
-            sprintf(dispMsg, "Freqency : %f Hz   ", 1000/freq);
+            sprintf(dispMsg, "Freq : %d   ", (int) freq);
             NNXT_LCD_DisplayStringAtLine(0, dispMsg);
             cancelTimer(0);
             setTimer(0, freq, TIMER_FINISHED);
@@ -76,7 +76,7 @@ void baguette() {
         if(eventIsSet(CLICK_RIGHT)){
             freq *= 2;
             if(freq > 10000) freq = 10000;
-            sprintf(dispMsg, "Freqency : %f Hz   ", 1000/freq);
+            sprintf(dispMsg, "Freq : %d   ", (int) freq);
             NNXT_LCD_DisplayStringAtLine(0, dispMsg);
             cancelTimer(0);
             setTimer(0, freq, TIMER_FINISHED);
