@@ -1,114 +1,59 @@
 #include "nnxt.h"
-#include "nnxt_pcf8574lb.h"
-#include "stdbool.h"
-#include "event.h"
-#include "timer.h"
+#define IR_SENSOR Port_3
 
-#define I2C_PORT Port_3
+const int16_t correctionPoints[][2] = {
+    {78, 0},
+    {85, 1},
+    {106, 2},
+    {137, 3},
+    {180, 4},
+    {270, 5},
+    {615, 6}
+};
 
-#define TOUCH_LEFT Port_0
-#define TOUCH_RIGHT Port_1
+const uint8_t correctionPointsLength = sizeof(correctionPoints) / sizeof(correctionPoints[0]);
 
-#define CLICK_LEFT 0
-#define CLICK_RIGHT 1
-
-#define TIMER_FINISHED 2
-
-void onLeftSensorClick()
-{
-    while (1)
-    {
-        Delay(50);
-        sensor_touch_clicked_t touch;
-        Touch_Clicked(TOUCH_LEFT, &touch);
-        if (touch == SensorTouch_clicked)
-        {
-            setEvent(CLICK_LEFT);
-        }
-    }
+uint16_t getDistance(){
+    uint16_t distance;
+    SensorADCWithFilter(IR_SENSOR, &distance);
+    return distance;
 }
 
-void onRightSensorClick()
-{
-    while (1)
-    {
-        Delay(50);
-        sensor_touch_clicked_t touch;
-        Touch_Clicked(TOUCH_RIGHT, &touch);
-        if (touch == SensorTouch_clicked)
-        {
-            setEvent(CLICK_RIGHT);
-        }
+uint16_t calcDistance(uint16_t distance) {
+    // Find index where reference distance is just below actual distance
+    uint8_t index = 0;
+    while (index < correctionPointsLength && correctionPoints[index][0] < distance) {
+        index++;
     }
+
+    // If distance is below the first reference point, return the first reference point
+    if (index == 0) {
+        return correctionPoints[0][1];
+    }
+    
+    // Calculate slope
+    uint8_t lowerIndex = index - 1;
+    int16_t slope = ((int32_t)(correctionPoints[index][1] - correctionPoints[lowerIndex][1]) * 1000) / (correctionPoints[index][0] - correctionPoints[lowerIndex][0]);
+
+    // Linear interpolation
+    return (correctionPoints[lowerIndex][1] * 1000 + slope * (distance - correctionPoints[lowerIndex][0])) / 1000;
 }
 
-void baguette()
-{
-    uint32_t freq = 1000;
-    char dispMsg[100];
-    bool ledOn = false;
-    setTimer(0, freq, TIMER_FINISHED);
-    startTimer(0);
-    sprintf(dispMsg, "Freq : %d   ", (int)freq);
-    NNXT_LCD_DisplayStringAtLine(0, dispMsg);
-    while (1)
-    {
-        if (eventIsSet(TIMER_FINISHED))
-        {
-            ledOn = !ledOn;
-            if (ledOn)
-            {
-                WritePort(I2C_PORT, 0);
-            }
-            else
-            {
-                DeletePort(I2C_PORT, 0);
-            }
-            cancelTimer(0);
-            startTimer(0);
-            clearEvent(TIMER_FINISHED);
-        }
-        if (eventIsSet(CLICK_LEFT))
-        {
-            freq /= 2;
-            if (freq < 1)
-                freq = 1;
-            sprintf(dispMsg, "Freq : %d   ", (int)freq);
-            NNXT_LCD_DisplayStringAtLine(0, dispMsg);
-            cancelTimer(0);
-            setTimer(0, freq, TIMER_FINISHED);
-            clearEvent(TIMER_FINISHED);
-            startTimer(0);
-            clearEvent(CLICK_LEFT);
-        }
-        if (eventIsSet(CLICK_RIGHT))
-        {
-            freq *= 2;
-            if (freq > 10000)
-                freq = 10000;
-            sprintf(dispMsg, "Freq : %d   ", (int)freq);
-            NNXT_LCD_DisplayStringAtLine(0, dispMsg);
-            cancelTimer(0);
-            setTimer(0, freq, TIMER_FINISHED);
-            clearEvent(TIMER_FINISHED);
-            startTimer(0);
-            clearEvent(CLICK_RIGHT);
-        }
-    }
-}
+int main(){
+	uint16_t value;
+    uint16_t distance;
+	char msg[40];
+	while(1)
+	{
+        value = getDistance();
+        sprintf(msg, "%d   ", value);
+        NNXT_LCD_DisplayStringAtLine(0, msg);
+		distance = calcDistance(value);
+		sprintf(msg, "%d  ", ( distance/ 1000));
+        NNXT_LCD_DisplayStringAtLine(1, msg);
+		NNXT_LCD_DisplayStringAtLine(4 , "WHY ARE WE STILL HERE?");
+		Delay(250);
+	}
+	return 0;
 
-int main()
-{
-    SensorConfig(TOUCH_LEFT, SensorTouch);
-    SensorConfig(TOUCH_RIGHT, SensorTouch);
-
-    CreateAndStartTask(timerTask);
-
-    CreateAndStartTask(onLeftSensorClick);
-    CreateAndStartTask(onRightSensorClick);
-    CreateAndStartTask(baguette);
-
-    StartScheduler();
-
-    return 0;
 }
