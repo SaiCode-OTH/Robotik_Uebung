@@ -49,7 +49,7 @@ int main()
         sprintf(msg, "%d   ", value);
         NNXT_LCD_DisplayStringAtLine(0, msg);
         distance = calcDistance(value);
-        sprintf(msg, "%d  ", (distance / 1000));
+        sprintf(msg, "%d  ", distance);
         NNXT_LCD_DisplayStringAtLine(1, msg);
         NNXT_LCD_DisplayStringAtLine(4, "I AM Garbage");
         Delay(250);
