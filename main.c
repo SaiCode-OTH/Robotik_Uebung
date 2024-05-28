@@ -37,6 +37,13 @@ uint16_t calcDistance(uint16_t distance)
 
     sprintf(msg, " index: %d | slope: %d  -> res: %d   \n", index, slope, (correctionPoints[lowerIndex][1] * 1000 + slope * (distance - correctionPoints[lowerIndex][0])) / 1000);
     printf(msg);
+
+    sprintf(msg, " i: %d", index);
+    NNXT_LCD_DisplayStringAtLine(4, msg);
+
+    sprintf(msg, " s: %d", slope);
+    NNXT_LCD_DisplayStringAtLine(5, msg);
+
     // Linear interpolation
     return (correctionPoints[lowerIndex][1] * 1000 + slope * (distance - correctionPoints[lowerIndex][0])) / 1000;
 }
@@ -54,7 +61,6 @@ int main()
         distance = calcDistance(value);
         sprintf(msg, "%d  ", distance);
         NNXT_LCD_DisplayStringAtLine(1, msg);
-        NNXT_LCD_DisplayStringAtLine(4, "I AM Garbage");
         Delay(250);
     }
     return 0;
