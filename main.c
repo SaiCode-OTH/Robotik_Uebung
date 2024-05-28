@@ -2,15 +2,17 @@
 #define IR_SENSOR Port_3
 
 const int16_t correctionPoints[][2] = {
-    {50, 800},
-    {60, 700},
-    {78, 600},
-    {85, 500},
-    {106, 400},
-    {137, 300},
-    {180, 200},
-    {270, 100},
-    {615, 0}
+    {1000, 20000},
+    {1100, 8000},
+    {1250, 5000},
+    {1350, 4000},
+    {1400, 3000},
+    {1600, 2500},
+    {1800, 2000},
+    {2000, 1500},
+    {2600, 1000},
+    {4000, 500},
+    {4100, 0}
     };
 
 const uint8_t correctionPointsLength = sizeof(correctionPoints) / sizeof(correctionPoints[0]);
