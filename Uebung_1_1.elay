@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <EmBitz_layout_file>
 	<ActiveTarget name="Debug" />
-	<File name="event.c" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="event.c" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="0" topLine="0" />
 		</Cursor>
@@ -11,12 +11,22 @@
 			<Cursor1 position="2710" topLine="36" />
 		</Cursor>
 	</File>
-	<File name="Libs\NNXT\inc\nnxt_pcf8574lb.h" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Libs\NNXT\inc\nnxt_pcf8574lb.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="311" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="Libs\STM32 Board\SPL\src\stm32f4xx_exti.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Libs\NNXT\inc\nnxt_Ports.h" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5981" topLine="169" />
+		</Cursor>
+	</File>
+	<File name="Libs\NNXT\src\nnxt_sensors.c" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="9896" topLine="225" />
+		</Cursor>
+	</File>
+	<File name="Libs\STM32 Board\SPL\src\stm32f4xx_exti.c" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="9014" topLine="209" />
 		</Cursor>
@@ -26,12 +36,12 @@
 			<Cursor1 position="10566" topLine="191" />
 		</Cursor>
 	</File>
-	<File name="main.c" open="1" top="1" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="main.c" open="1" top="1" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="2359" topLine="59" />
+			<Cursor1 position="422" topLine="14" />
 		</Cursor>
 	</File>
-	<File name="timer.c" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="timer.c" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="392" topLine="0" />
 		</Cursor>
